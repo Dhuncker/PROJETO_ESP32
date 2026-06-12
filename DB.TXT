@@ -1,0 +1,8 @@
+create database motor;
+use motor;
+
+create table table_motor(
+	id int auto_increment primary key,
+    vel	float,
+    RPM float
+    );

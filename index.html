@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Monitor de Telemetria Digital</title>
+<style>
+
+</style>
+</head>
+<body>
+<h1>Dados do Velocímetro</h1>
+<div class="valor">Velocidade: <span id="velocidade">0</span> km/h</div>
+<div class="valor">RPM: <span id="rpm">0</span></div>
+<script>
+function atualizarDados() {
+fetch('salvar_dados.php')
+.then(response => response.json())
+.then(data => {
+document.getElementById('vel').innerText =
+data.velocidade;
+document.getElementById('RPM').innerText = data.rpm;
+})
+.catch(error => console.log("Falha na requisição dos dados:",
+error));
+}
+atualizarDados();
+</script>
+</body>
+</html>
