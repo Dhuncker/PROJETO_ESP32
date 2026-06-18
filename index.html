@@ -4,26 +4,76 @@
 <meta charset="UTF-8">
 <title>Monitor de Telemetria Digital</title>
 <style>
-
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #0d1117; color: #c9d1d9; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; }
+h1 { font-size: 2.5rem; margin-bottom: 2rem; color: #58a6ff; text-transform: uppercase; letter-spacing: 2px; text-shadow: 0 0 10px rgba(88, 166, 255, 0.5); }
+.container-dados { display: flex; gap: 2rem; width: 90%; max-width: 800px; flex-wrap: wrap; justify-content: center; margin-bottom: 2rem; }
+.card { background-color: #161b22; border: 1px solid #30363d; border-radius: 15px; padding: 2rem; width: 250px; text-align: center; box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3); }
+.titulo-valor { font-size: 1.2rem; color: #8b949e; margin-bottom: 1rem; text-transform: uppercase; }
+.valor { font-size: 3rem; font-weight: bold; color: #ffffff; font-family: 'Courier New', Courier, monospace; }
+.unidade { font-size: 1.2rem; color: #8b949e; margin-left: 0.2rem; }
+#velocidade-card .valor { color: #3fb950; text-shadow: 0 0 15px rgba(63, 185, 80, 0.4); }
+#rpm-card .valor { color: #f2cc60; text-shadow: 0 0 15px rgba(242, 204, 96, 0.4); }
+.gauge-container { position: relative; width: 250px; height: 125px; margin-bottom: 2rem; }
+.gauge-background { fill: none; stroke: #21262d; stroke-width: 15; stroke-linecap: round; }
+.gauge-fill { fill: none; stroke: #3fb950; stroke-width: 15; stroke-linecap: round; transition: stroke-dasharray 0.3s ease, stroke 0.3s ease; }
+.gauge-text { font-size: 1.2rem; fill: #8b949e; font-family: 'Segoe UI', Tahoma, sans-serif; }
+@media (max-width: 600px) { h1 { font-size: 1.8rem; } .card { width: 100%; } }
 </style>
 </head>
 <body>
 <h1>Dados do Velocímetro</h1>
-<div class="valor">Velocidade: <span id="velocidade">0</span> km/h</div>
-<div class="valor">RPM: <span id="rpm">0</span></div>
+
+<div class="gauge-container">
+<svg width="100%" height="100%" viewBox="0 0 200 100">
+<path class="gauge-background" d="M 20 90 A 80 80 0 0 1 180 90" />
+<path id="gauge-fill" class="gauge-fill" d="M 20 90 A 80 80 0 0 1 180 90" stroke-dasharray="251.2" stroke-dashoffset="251.2" />
+</svg>
+</div>
+
+<div class="container-dados">
+<div class="card" id="velocidade-card">
+<div class="titulo-valor">Velocidade</div>
+<div class="valor"><span id="velocidade">0</span><span class="unidade">km/h</span></div>
+</div>
+<div class="card" id="rpm-card">
+<div class="titulo-valor">RPM</div>
+<div class="valor"><span id="rpm">0</span></div>
+</div>
+</div>
+
 <script>
+const raio = 80;
+const circunferencia = 2 * Math.PI * raio; // ~251.2
+const gaugeFill = document.getElementById('gauge-fill');
+gaugeFill.style.strokeDasharray = circunferencia;
+
 function atualizarDados() {
-fetch('salvar_dados.php')
+fetch('buscar_ultimo.php')
 .then(response => response.json())
 .then(data => {
-document.getElementById('vel').innerText =
-data.velocidade;
-document.getElementById('RPM').innerText = data.rpm;
-})
-.catch(error => console.log("Falha na requisição dos dados:",
-error));
+const vel = Number(data.velocidade);
+document.getElementById('velocidade').innerText = vel;
+document.getElementById('rpm').innerText = data.rpm;
+
+// Mapeia velocidade de 0 a 200 km/h para o traço (0% a 100%)
+const velocidadeMax = 200;
+const progresso = Math.min(Math.max(vel / velocidadeMax, 0), 1);
+const offset = circunferencia - (progresso * circunferencia);
+
+gaugeFill.style.strokeDashoffset = offset;
+
+if (vel > 160) {
+gaugeFill.style.stroke = '#f85149'; 
+} else {
+gaugeFill.style.stroke = '#3fb950';
 }
+})
+.catch(error => console.log("Falha na requisição dos dados:", error));
+}
+
 atualizarDados();
+setInterval(atualizarDados, 1000);
 </script>
 </body>
 </html>

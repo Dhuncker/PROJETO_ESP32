@@ -11,7 +11,7 @@ $conn = mysqli_connect($servername, $username, $password, $dbname);
         die("falha em conexão:" . mysqli_connect_error());
     }
     
-    echo "Connected successfully!";
+   
 
     if (isset($_POST['velocidade']) && isset($_POST['rpm'])) {
         $vel = $_POST['velocidade'];
