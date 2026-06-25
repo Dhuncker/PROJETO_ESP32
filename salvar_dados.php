@@ -18,7 +18,7 @@ $conn = mysqli_connect($servername, $username, $password, $dbname);
         $rpm = $_POST['rpm'];
     }
         
-$sql = "insert into table_motor (id, nome) values ('$vel', '$rpm')";
+$sql = "INSERT INTO table_motor (vel, RPM) VALUES ('$vel', '$rpm')";
 
 mysqli_query($conn, $sql);
 
